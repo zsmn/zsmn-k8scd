@@ -39,7 +39,7 @@ spec:
                 -u temporal \
                 --pw temporal \
                 --pl postgresql12 \
-                create-database --db temporal
+                create-database --defaultdb temporal temporal
 
               temporal-sql-tool \
                 --ep postgres.temporal.svc.cluster.local \
@@ -47,7 +47,7 @@ spec:
                 -u temporal \
                 --pw temporal \
                 --pl postgresql12 \
-                create-database --db temporal_visibility
+                create-database --defaultdb temporal_visibility temporal_visibility
 
               echo "Setting up default database schema..."
               temporal-sql-tool \
