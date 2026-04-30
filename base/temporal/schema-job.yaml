@@ -37,7 +37,7 @@ spec:
               PGPASSWORD=temporal psql -h postgres.temporal.svc.cluster.local -U temporal -d postgres -c "SELECT 1 FROM pg_database WHERE datname='temporal_visibility'" | grep -q 1 || PGPASSWORD=temporal createdb -h postgres.temporal.svc.cluster.local -U temporal temporal_visibility
 
               echo "Setting up default database schema..."
-              temporal_operator_cluster_schema_setup \
+              temporal operator cluster schema setup \
                 --endpoint postgres.temporal.svc.cluster.local \
                 --port 5432 \
                 --database temporal \
@@ -47,7 +47,7 @@ spec:
                 --plugin postgresql12
 
               echo "Setting up visibility database schema..."
-              temporal_operator_cluster_schema_setup \
+              temporal operator cluster schema setup \
                 --endpoint postgres.temporal.svc.cluster.local \
                 --port 5432 \
                 --database temporal_visibility \
