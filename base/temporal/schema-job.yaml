@@ -32,53 +32,66 @@ spec:
               done
               sleep 3
 
-              echo "Creating databases if they don't exist..."
-              PGPASSWORD=temporal psql -h postgres.temporal.svc.cluster.local -U temporal -d postgres -c "SELECT 1 FROM pg_database WHERE datname='temporal'" | grep -q 1 || PGPASSWORD=temporal createdb -h postgres.temporal.svc.cluster.local -U temporal temporal
-              PGPASSWORD=temporal psql -h postgres.temporal.svc.cluster.local -U temporal -d postgres -c "SELECT 1 FROM pg_database WHERE datname='temporal_visibility'" | grep -q 1 || PGPASSWORD=temporal createdb -h postgres.temporal.svc.cluster.local -U temporal temporal_visibility
+              echo "Creating databases..."
+              temporal-sql-tool \
+                --ep postgres.temporal.svc.cluster.local \
+                -p 5432 \
+                -u temporal \
+                --pw temporal \
+                --pl postgresql12 \
+                create-database --db temporal
+
+              temporal-sql-tool \
+                --ep postgres.temporal.svc.cluster.local \
+                -p 5432 \
+                -u temporal \
+                --pw temporal \
+                --pl postgresql12 \
+                create-database --db temporal_visibility
 
               echo "Setting up default database schema..."
               temporal-sql-tool \
-                --endpoint postgres.temporal.svc.cluster.local \
-                --port 5432 \
-                --database temporal \
-                --username temporal \
-                --password temporal \
-                --plugin postgresql12 \
+                --ep postgres.temporal.svc.cluster.local \
+                -p 5432 \
+                -u temporal \
+                --pw temporal \
+                --pl postgresql12 \
+                --db temporal \
                 setup-schema \
-                --schema-dir /etc/temporal/schema/postgresql/v12/temporal/versioned \
-                --version v1.0
+                --schema-name postgresql/v12/temporal \
+                -v 0.0
 
               echo "Updating default database schema to latest..."
               temporal-sql-tool \
-                --endpoint postgres.temporal.svc.cluster.local \
-                --port 5432 \
-                --database temporal \
-                --username temporal \
-                --password temporal \
-                --plugin postgresql12 \
+                --ep postgres.temporal.svc.cluster.local \
+                -p 5432 \
+                -u temporal \
+                --pw temporal \
+                --pl postgresql12 \
+                --db temporal \
                 update-schema \
                 --schema-dir /etc/temporal/schema/postgresql/v12/temporal/versioned
 
               echo "Setting up visibility database schema..."
               temporal-sql-tool \
-                --endpoint postgres.temporal.svc.cluster.local \
-                --port 5432 \
-                --database temporal_visibility \
-                --username temporal \
-                --password temporal \
-                --plugin postgresql12 \
+                --ep postgres.temporal.svc.cluster.local \
+                -p 5432 \
+                -u temporal \
+                --pw temporal \
+                --pl postgresql12 \
+                --db temporal_visibility \
                 setup-schema \
-                --schema-dir /etc/temporal/schema/postgresql/v12/visibility/versioned \
-                --version v1.0
+                --schema-name postgresql/v12/visibility \
+                -v 0.0
 
               echo "Updating visibility database schema to latest..."
               temporal-sql-tool \
-                --endpoint postgres.temporal.svc.cluster.local \
-                --port 5432 \
-                --database temporal_visibility \
-                --username temporal \
-                --password temporal \
-                --plugin postgresql12 \
+                --ep postgres.temporal.svc.cluster.local \
+                -p 5432 \
+                -u temporal \
+                --pw temporal \
+                --pl postgresql12 \
+                --db temporal_visibility \
                 update-schema \
                 --schema-dir /etc/temporal/schema/postgresql/v12/visibility/versioned
 
