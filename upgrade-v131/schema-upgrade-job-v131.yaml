@@ -37,7 +37,7 @@ spec:
                 -p 5432 \
                 -u temporal \
                 --pw temporal \
-                --pl postgresql12 \
+                --pl postgres12 \
                 --db temporal \
                 update-schema \
                 --schema-dir /etc/temporal/schema/postgresql/v12/temporal/versioned
@@ -48,7 +48,7 @@ spec:
                 -p 5432 \
                 -u temporal \
                 --pw temporal \
-                --pl postgresql12 \
+                --pl postgres12 \
                 --db temporal_visibility \
                 update-schema \
                 --schema-dir /etc/temporal/schema/postgresql/v12/visibility/versioned

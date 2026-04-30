@@ -38,7 +38,7 @@ spec:
                 -p 5432 \
                 -u temporal \
                 --pw temporal \
-                --pl postgresql12 \
+                --pl postgres12 \
                 create-database --defaultdb temporal temporal
 
               temporal-sql-tool \
@@ -46,7 +46,7 @@ spec:
                 -p 5432 \
                 -u temporal \
                 --pw temporal \
-                --pl postgresql12 \
+                --pl postgres12 \
                 create-database --defaultdb temporal_visibility temporal_visibility
 
               echo "Setting up default database schema..."
@@ -55,7 +55,7 @@ spec:
                 -p 5432 \
                 -u temporal \
                 --pw temporal \
-                --pl postgresql12 \
+                --pl postgres12 \
                 --db temporal \
                 setup-schema \
                 --schema-name postgresql/v12/temporal \
@@ -67,7 +67,7 @@ spec:
                 -p 5432 \
                 -u temporal \
                 --pw temporal \
-                --pl postgresql12 \
+                --pl postgres12 \
                 --db temporal \
                 update-schema \
                 --schema-dir /etc/temporal/schema/postgresql/v12/temporal/versioned
@@ -78,7 +78,7 @@ spec:
                 -p 5432 \
                 -u temporal \
                 --pw temporal \
-                --pl postgresql12 \
+                --pl postgres12 \
                 --db temporal_visibility \
                 setup-schema \
                 --schema-name postgresql/v12/visibility \
@@ -90,7 +90,7 @@ spec:
                 -p 5432 \
                 -u temporal \
                 --pw temporal \
-                --pl postgresql12 \
+                --pl postgres12 \
                 --db temporal_visibility \
                 update-schema \
                 --schema-dir /etc/temporal/schema/postgresql/v12/visibility/versioned
