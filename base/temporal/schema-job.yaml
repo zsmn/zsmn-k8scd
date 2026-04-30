@@ -33,21 +33,8 @@ spec:
               sleep 3
 
               echo "Creating databases..."
-              temporal-sql-tool \
-                --ep postgres.temporal.svc.cluster.local \
-                -p 5432 \
-                -u temporal \
-                --pw temporal \
-                --pl postgres12 \
-                create-database --defaultdb temporal temporal
-
-              temporal-sql-tool \
-                --ep postgres.temporal.svc.cluster.local \
-                -p 5432 \
-                -u temporal \
-                --pw temporal \
-                --pl postgres12 \
-                create-database --defaultdb temporal_visibility temporal_visibility
+              PGPASSWORD=temporal psql -h postgres.temporal.svc.cluster.local -U temporal -d postgres -c "SELECT 1 FROM pg_database WHERE datname='temporal'" | grep -q 1 || PGPASSWORD=temporal createdb -h postgres.temporal.svc.cluster.local -U temporal temporal
+              PGPASSWORD=temporal psql -h postgres.temporal.svc.cluster.local -U temporal -d postgres -c "SELECT 1 FROM pg_database WHERE datname='temporal_visibility'" | grep -q 1 || PGPASSWORD=temporal createdb -h postgres.temporal.svc.cluster.local -U temporal temporal_visibility
 
               echo "Setting up default database schema..."
               temporal-sql-tool \
