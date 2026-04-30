@@ -32,24 +32,26 @@ spec:
               done
 
               echo "Upgrading default (core) database schema to v1.19..."
-              temporal operator cluster schema update \
+              temporal-sql-tool \
                 --endpoint postgres.temporal.svc.cluster.local \
                 --port 5432 \
                 --database temporal \
                 --username temporal \
                 --password temporal \
-                --schema-dir /etc/temporal/schema/postgresql/v96/temporal/versioned \
-                --plugin postgresql12
+                --plugin postgresql12 \
+                update-schema \
+                --schema-dir /etc/temporal/schema/postgresql/v12/temporal/versioned
 
               echo "Upgrading visibility database schema to v1.14..."
-              temporal operator cluster schema update \
+              temporal-sql-tool \
                 --endpoint postgres.temporal.svc.cluster.local \
                 --port 5432 \
                 --database temporal_visibility \
                 --username temporal \
                 --password temporal \
-                --schema-dir /etc/temporal/schema/postgresql/v96/visibility/versioned \
-                --plugin postgresql12
+                --plugin postgresql12 \
+                update-schema \
+                --schema-dir /etc/temporal/schema/postgresql/v12/visibility/versioned
 
               echo "Schema upgrade complete! Safe to deploy Temporal v1.31.0 server."
           env:
