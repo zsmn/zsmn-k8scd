@@ -32,7 +32,7 @@ metadata:
     app.kubernetes.io/name: temporal
     app.kubernetes.io/version: "1.29.4"
 data:
-  dynamicconfig.yaml: |
+  docker.yaml: |
     system.enableEagerWorkflowStart:
       - value: true
     system.enablePrincipalAttribution:

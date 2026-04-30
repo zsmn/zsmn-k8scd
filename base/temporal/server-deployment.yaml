@@ -41,64 +41,40 @@ spec:
             - containerPort: 9090
               name: metrics
           env:
-            - name: DB_TYPE
-              valueFrom:
-                configMapKeyRef:
-                  name: temporal-config
-                  key: DB_TYPE
-            - name: DB_HOST
-              valueFrom:
-                configMapKeyRef:
-                  name: temporal-config
-                  key: DB_HOST
+            - name: DB
+              value: "postgres12"
+            - name: POSTGRES_SEEDS
+              value: "postgres.temporal.svc.cluster.local"
             - name: DB_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: temporal-config
-                  key: DB_PORT
-            - name: DB_USER
-              valueFrom:
-                configMapKeyRef:
-                  name: temporal-config
-                  key: DB_USER
-            - name: DB_NAME
-              valueFrom:
-                configMapKeyRef:
-                  name: temporal-config
-                  key: DB_NAME
-            - name: VISIBILITY_DB_NAME
-              valueFrom:
-                configMapKeyRef:
-                  name: temporal-config
-                  key: VISIBILITY_DB_NAME
-            - name: ENABLE_ES
-              valueFrom:
-                configMapKeyRef:
-                  name: temporal-config
-                  key: ENABLE_ES
-            - name: NUM_HISTORY_SHARDS
-              valueFrom:
-                configMapKeyRef:
-                  name: temporal-config
-                  key: NUM_HISTORY_SHARDS
-            - name: LOG_LEVEL
-              valueFrom:
-                configMapKeyRef:
-                  name: temporal-config
-                  key: LOG_LEVEL
-            - name: DYNAMIC_CONFIG_FILE_PATH
-              valueFrom:
-                configMapKeyRef:
-                  name: temporal-config
-                  key: DYNAMIC_CONFIG_FILE_PATH
-            - name: DB_PASSWORD
+              value: "5432"
+            - name: POSTGRES_USER
+              value: "temporal"
+            - name: POSTGRES_PWD
               valueFrom:
                 secretKeyRef:
                   name: postgres-secrets
                   key: POSTGRES_PASSWORD
+            - name: DBNAME
+              value: "temporal"
+            - name: VISIBILITY_DBNAME
+              value: "temporal_visibility"
+            - name: ENABLE_ES
+              value: "false"
+            - name: NUM_HISTORY_SHARDS
+              value: "4"
+            - name: LOG_LEVEL
+              value: "info"
+            - name: DYNAMIC_CONFIG_FILE_PATH
+              value: "/etc/temporal/config/dynamicconfig/docker.yaml"
+            - name: BIND_ON_IP
+              value: "0.0.0.0"
+            - name: TEMPORAL_BROADCAST_ADDRESS
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
           volumeMounts:
             - name: dynamic-config
-              mountPath: /etc/temporal/config
+              mountPath: /etc/temporal/config/dynamicconfig
           readinessProbe:
             exec:
               command: ["temporal", "operator", "cluster", "healthcheck"]
