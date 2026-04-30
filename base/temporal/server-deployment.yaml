@@ -76,14 +76,16 @@ spec:
             - name: dynamic-config
               mountPath: /etc/temporal/config/dynamicconfig
           readinessProbe:
-            exec:
-              command: ["temporal", "operator", "cluster", "healthcheck"]
+            httpGet:
+              path: /health
+              port: 7233
             initialDelaySeconds: 30
             periodSeconds: 10
             failureThreshold: 5
           livenessProbe:
-            exec:
-              command: ["temporal", "operator", "cluster", "healthcheck"]
+            httpGet:
+              path: /health
+              port: 7233
             initialDelaySeconds: 60
             periodSeconds: 15
           resources:
