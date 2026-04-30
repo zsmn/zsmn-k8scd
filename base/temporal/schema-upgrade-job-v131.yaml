@@ -1,0 +1,67 @@
+---
+# Temporal v1.31.0 - Schema Upgrade Job
+# Run this job BEFORE upgrading the server to v1.31.0.
+# UPGRADE: v1.30.x → v1.31.0 requires core schema v1.19 and visibility v1.14.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: temporal-schema-upgrade-v131
+  namespace: temporal
+  labels:
+    app: temporal-schema-upgrade
+    app.kubernetes.io/version: "1.31.0"
+spec:
+  backoffLimit: 5
+  template:
+    metadata:
+      labels:
+        app: temporal-schema-upgrade
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: schema-upgrade
+          image: temporalio/admin-tools:1.31.0
+          command: ["bash", "-c"]
+          args:
+            - |
+              set -e
+              echo "Waiting for PostgreSQL to be ready..."
+              until pg_isready -h postgres.temporal.svc.cluster.local -p 5432 -U temporal; do
+                echo "PostgreSQL not ready yet, waiting..."
+                sleep 2
+              done
+
+              echo "Upgrading default (core) database schema to v1.19..."
+              temporal_operator_cluster_schema_upgrade \
+                --address postgres.temporal.svc.cluster.local:5432 \
+                --database temporal \
+                --username temporal \
+                --password temporal \
+                --schema-dir /etc/temporal/schema/postgresql/v96/temporal/versioned \
+                --plugin postgresql12
+
+              echo "Upgrading visibility database schema to v1.14..."
+              temporal_operator_cluster_schema_upgrade \
+                --address postgres.temporal.svc.cluster.local:5432 \
+                --database temporal_visibility \
+                --username temporal \
+                --password temporal \
+                --schema-dir /etc/temporal/schema/postgresql/v96/visibility/versioned \
+                --plugin postgresql12
+
+              echo "Schema upgrade complete! Safe to deploy Temporal v1.31.0 server."
+          env:
+            - name: DB_TYPE
+              value: "postgresql"
+            - name: DB_HOST
+              value: "postgres.temporal.svc.cluster.local"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USER
+              value: "temporal"
+            - name: DB_PASSWORD
+              value: "temporal"
+            - name: DB_NAME
+              value: "temporal"
+            - name: VISIBILITY_DB_NAME
+              value: "temporal_visibility"

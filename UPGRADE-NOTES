@@ -1,0 +1,36 @@
+# Temporal v1.29.4 → v1.31.0 Upgrade Notes
+#
+# This manifest set deploys Temporal v1.29.4 with PostgreSQL.
+# Below is a summary of what needs to change for the upgrade.
+#
+# ═══════════════════════════════════════════════════════
+# UPGRADE CHECKLIST: v1.29.4 → v1.30.x → v1.31.0
+# ═══════════════════════════════════════════════════════
+#
+# STEP 1: v1.29.4 → v1.30.x
+#   - Update image tags: temporalio/server:1.30.x, temporalio/admin-tools:1.30.x
+#   - No schema changes required
+#   - Note: docker image slimmed down (tctl, dockerize, curl removed)
+#
+# STEP 2: v1.30.x → v1.31.0
+#   ⚠️ MANDATORY SCHEMA UPGRADES:
+#   - PostgreSQL core: upgrade to schema v1.19
+#   - PostgreSQL visibility: upgrade to schema v1.14
+#     (also Elasticsearch v14 if using ES)
+#
+#   - Update image tags: temporalio/server:1.31.0, temporalio/admin-tools:1.31.0
+#   - Schema Job: add a new job to run schema upgrades
+#   - Dynamic Config: add new flags (system.enablePrincipalAttribution, etc.)
+#   - New table: current_chasm_executions (created by schema migration)
+#
+# BREAKING CHANGES in v1.31.0:
+#   - Worker Versioning V1/V2 APIs removed in next version (v1.32.0)
+#   - Nexus always enabled (feature flag removed)
+#   - Custom persistence: must add ArchetypeID support
+#   - New matcher enabled by default (priority keys now respected)
+#
+# NEW FEATURES (off by default):
+#   - system.enablePrincipalAttribution → true (Principal attribution)
+#   - activity.enableStandalone → true (Standalone Activities)
+#   - passwordCommand config for IAM-based SQL auth
+#   - Cassandra 5.0.4+ support

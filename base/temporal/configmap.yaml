@@ -1,0 +1,41 @@
+---
+# Temporal v1.29.4 - Configuration
+# VERSION: This file contains version-specific configuration.
+# UPGRADE NOTE: Update image.tag when upgrading Temporal version.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: temporal-config
+  namespace: temporal
+  labels:
+    app.kubernetes.io/name: temporal
+    app.kubernetes.io/version: "1.29.4"
+data:
+  TEMPORAL_CLI_ADDRESS: "temporal-frontend:7233"
+  DB_TYPE: "postgresql"
+  DB_HOST: "postgres.temporal.svc.cluster.local"
+  DB_PORT: "5432"
+  DB_USER: "temporal"
+  DB_NAME: "temporal"
+  VISIBILITY_DB_NAME: "temporal_visibility"
+  ENABLE_ES: "false"
+  NUM_HISTORY_SHARDS: "4"
+  LOG_LEVEL: "info"
+  DYNAMIC_CONFIG_FILE_PATH: "/etc/temporal/config/dynamicconfig.yaml"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: temporal-dynamic-config
+  namespace: temporal
+  labels:
+    app.kubernetes.io/name: temporal
+    app.kubernetes.io/version: "1.29.4"
+data:
+  dynamicconfig.yaml: |
+    system.enableEagerWorkflowStart:
+      - value: true
+    system.enablePrincipalAttribution:
+      - value: false
+    matching.enableFairness:
+      - value: false

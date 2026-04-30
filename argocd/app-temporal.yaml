@@ -1,0 +1,29 @@
+---
+# ArgoCD Application that deploys all Temporal v1.29.4 resources
+# REPO_URL: Update this to your actual Git repository URL
+# UPGRADE NOTE: After upgrading the manifests in the repo, ArgoCD will
+# automatically sync the changes. For manual sync: argocd app sync temporal
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: temporal
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: temporal
+spec:
+  project: default
+  source:
+    repoURL: REPO_URL_PLACEHOLDER
+    targetRevision: HEAD
+    path: base
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: temporal
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

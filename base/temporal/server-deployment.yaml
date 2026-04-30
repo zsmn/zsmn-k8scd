@@ -1,0 +1,123 @@
+---
+# Temporal v1.29.4 - Server Deployment
+# VERSION: Update image.tag to upgrade Temporal.
+# UPGRADE NOTE: After schema upgrade, change image tag here.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: temporal-server
+  namespace: temporal
+  labels:
+    app: temporal-server
+    app.kubernetes.io/name: temporal
+    app.kubernetes.io/version: "1.29.4"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: temporal-server
+  template:
+    metadata:
+      labels:
+        app: temporal-server
+        app.kubernetes.io/version: "1.29.4"
+    spec:
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:15
+          command: ["sh", "-c"]
+          args:
+            - |
+              until pg_isready -h postgres.temporal.svc.cluster.local -p 5432 -U temporal; do
+                echo "Waiting for PostgreSQL..."
+                sleep 2
+              done
+      containers:
+        - name: temporal-server
+          image: temporalio/server:1.29.4
+          ports:
+            - containerPort: 7233
+              name: grpc
+            - containerPort: 9090
+              name: metrics
+          env:
+            - name: DB_TYPE
+              valueFrom:
+                configMapKeyRef:
+                  name: temporal-config
+                  key: DB_TYPE
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: temporal-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: temporal-config
+                  key: DB_PORT
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: temporal-config
+                  key: DB_USER
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: temporal-config
+                  key: DB_NAME
+            - name: VISIBILITY_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: temporal-config
+                  key: VISIBILITY_DB_NAME
+            - name: ENABLE_ES
+              valueFrom:
+                configMapKeyRef:
+                  name: temporal-config
+                  key: ENABLE_ES
+            - name: NUM_HISTORY_SHARDS
+              valueFrom:
+                configMapKeyRef:
+                  name: temporal-config
+                  key: NUM_HISTORY_SHARDS
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: temporal-config
+                  key: LOG_LEVEL
+            - name: DYNAMIC_CONFIG_FILE_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: temporal-config
+                  key: DYNAMIC_CONFIG_FILE_PATH
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: dynamic-config
+              mountPath: /etc/temporal/config
+          readinessProbe:
+            exec:
+              command: ["temporal", "operator", "cluster", "healthcheck"]
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 5
+          livenessProbe:
+            exec:
+              command: ["temporal", "operator", "cluster", "healthcheck"]
+            initialDelaySeconds: 60
+            periodSeconds: 15
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+      volumes:
+        - name: dynamic-config
+          configMap:
+            name: temporal-dynamic-config
