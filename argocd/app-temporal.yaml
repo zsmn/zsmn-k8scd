@@ -1,6 +1,5 @@
 ---
 # ArgoCD Application that deploys all Temporal v1.29.4 resources
-# REPO_URL: Update this to your actual Git repository URL
 # UPGRADE NOTE: After upgrading the manifests in the repo, ArgoCD will
 # automatically sync the changes. For manual sync: argocd app sync temporal
 apiVersion: argoproj.io/v1alpha1
@@ -13,7 +12,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: git://192.168.49.1:9419/zsmn-k8scd
+    repoURL: https://github.com/zsmn/zsmn-k8scd.git
     targetRevision: HEAD
     path: base
     directory:
